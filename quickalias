@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import os
+
+config_location = "/home/diegocaples/.config/fish/config.fish"
+
+alias = input('enter alias for command: ')
+command = input('enter the command: ')
+
+command = "echo 'alias {}=\"{}\"' >> {}".format(alias, command, config_location)
+
+print("adding ", command, "to shell config")
+
+os.system(command)
+source_command = "source " + config_location
+
