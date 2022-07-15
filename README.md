@@ -8,5 +8,5 @@ This simple python script creates pemenant aliases so you don't have to open you
 sudo chmod +x ~/.local/bin/quickalias
 ```
 4. install python3
-5. run quickalias to create an alias
+5. run quickalias to create an alias, then source your shell config.
 6. Profit!!
