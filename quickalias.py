@@ -11,7 +11,8 @@ user_directory: str = os.path.expanduser('~')
 # Getting the process id of the parent process.
 process_id: str = os.readlink(f'/proc/{os.getppid()}/exe')
 
-if __name__ == "__main__":
+
+def main() -> None:
     if "bash" in process_id:
         SHELL = "bash"
         # Getting the path of the bashrc.
@@ -61,3 +62,11 @@ if __name__ == "__main__":
 
     source_command: str = f"source {config_location}"
     print(f"You can source the new changes with:\n\t{source_command}")
+
+    return
+
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
