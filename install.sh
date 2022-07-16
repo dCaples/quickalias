@@ -1,2 +1,9 @@
 #!/usr/bin/env sh
-install -Dm755 ./quickalias $HOME/.local/bin/quickalias
+
+if [ ! -f "/usr/bin/python3" ]; then
+
+  echo "no python3 found at '/usr/bin/python3'"
+  exit 1
+fi
+
+install -Dm755 ./quickalias.py "$HOME/.local/bin/quickalias"
