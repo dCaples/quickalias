@@ -37,8 +37,8 @@ if __name__ == "__main__":
     else:
         config_location: str = f"{user_directory}/.config/fish/config.fish"
     # Asking the user to input the alias and the command.
-    alias: str = input('enter alias for command: ')
-    command: str = input('enter the command: ')
+    alias: str = input('Enter alias for command: ')
+    command: str = input('Enter the command: ')
 
     if SHELL in "bash" or SHELL in "zsh":
         alias_string: str = f"alias {alias}=\"{command}\""
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     with open(config_location, 'a', encoding="utf-8") as f:
         f.write(f"{alias_string}\n")
 
-    print(f"added \"{alias_string}\" to shell config")
+    print(f"Added \"{alias_string}\" to shell config")
 
     source_command: str = f"source {config_location}"
     print(f"You can source the new changes with:\n\t{source_command}")
