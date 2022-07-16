@@ -18,14 +18,17 @@ if "bash" in process_id:
 
 elif "zsh" in process_id:
     SHELL = "zsh"
+   # Getting the path of the .zshrc file.
     shell_config_path: str = os.path.join(user_directory, '.zshrc')
 elif "fish" in process_id:
     SHELL = "fish"
+    # Getting the path of the config.fish file.
     shell_config_path: str = os.path.join(
         user_directory, '.config/fish/config.fish')
 else:
+    # If the shell is not detected, it will default to fish.
     SHELL = "fish"
-    print("Shell not detected, using default shell (fish).")
+    print("Shell not detected. Defaulting to fish.")
     shell_config_path: str = None
 
 if shell_config_path is not None:
@@ -33,6 +36,7 @@ if shell_config_path is not None:
 else:
     config_location: str = f"{user_directory}/.config/fish/config.fish"
 
+# Asking the user to input the alias and the command.
 alias: str = input('enter alias for command: ')
 command: str = input('enter the command: ')
 
@@ -42,11 +46,14 @@ if SHELL in "bash" or SHELL in "zsh":
 else:
     alias_string: str = f"alias {alias} \"{command}\""
 
+# This is checking if the alias already exists in the config file.
+# if it does, it will not add it again.
 with open(config_location, encoding="utf-8") as f:
     if alias_string in f.read():
         print(f"{alias} already exists in {config_location}")
         sys.exit(0)
 
+# Opening the config file in append mode and writing the alias to the file.
 with open(config_location, 'a', encoding="utf-8") as f:
     f.write(f"{alias_string}\n")
 
