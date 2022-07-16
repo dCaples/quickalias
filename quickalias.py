@@ -6,7 +6,7 @@ import os
 import sys
 
 # Getting the home directory of the user.
-user_directory: str = os.environ['HOME']
+user_directory: str = os.path.expanduser('~')
 
 # Getting the process id of the parent process.
 process_id: str = os.readlink(f'/proc/{os.getppid()}/exe')
