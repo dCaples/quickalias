@@ -2,15 +2,16 @@
 
 import os
 
-config_location = "/home/diegocaples/.config/fish/config.fish"
+user_directory = os.path.expanduser('~')
+
+config_location = f"{user_directory}/.config/fish/config.fish"
 
 alias = input('enter alias for command: ')
 command = input('enter the command: ')
 
-command = "echo 'alias {}=\"{}\"' >> {}".format(alias, command, config_location)
+command = f"echo 'alias {alias}=\"{command}\"' >> {config_location}"
 
-print("adding ", command, "to shell config")
+print(f"adding {command} to shell config")
 
 os.system(command)
-source_command = "source " + config_location
-
+source_command = f"source {config_location}"
