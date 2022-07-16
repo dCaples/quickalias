@@ -1,5 +1,6 @@
 # Quickalias
-This simple python script creates pemenant aliases so you don't have to open your shell config file
+
+This python script creates permanent aliases so you don't have to open your shell config file
 
 *Dependencies:*
 
@@ -7,10 +8,11 @@ This simple python script creates pemenant aliases so you don't have to open you
 
 ## Install and setup
 
-1. Make sure to set the config_location to where your shell config is (~/.bashrc for bash, ~/.zshrc for zsh, etc).
 run the folowing to isntall
-```
+
+```bash
 sudo ./install
 ```
-5. run quickalias to create an alias, then source your shell config.
-6. Profit!!
+
+1. run quickalias to create an alias, then source your shell config.
+2. Profit!!
