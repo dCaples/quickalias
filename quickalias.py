@@ -4,6 +4,7 @@ This simple python script creates pemenant aliases so you don't have to open you
 """
 import os
 import sys
+import subprocess
 
 # Getting the home directory of the user.
 user_directory: str = os.path.expanduser('~')
@@ -43,19 +44,20 @@ command: str = input('enter the command: ')
 if SHELL in "bash" or SHELL in "zsh":
     alias_string: str = f"alias {alias}=\"{command}\""
 
+    # This is checking if the alias already exists in the config file.
+    # if it does, it will not add it again.
+    with open(config_location, encoding="utf-8") as f:
+        if alias_string in f.read():
+            print(f"{alias} already exists in {config_location}")
+            sys.exit(0)
+
+    # Opening the config file in append mode and writing the alias to the file.
+    with open(config_location, 'a', encoding="utf-8") as f:
+        f.write(f"{alias_string}\n")
 else:
-    alias_string: str = f"alias {alias} \"{command}\""
-
-# This is checking if the alias already exists in the config file.
-# if it does, it will not add it again.
-with open(config_location, encoding="utf-8") as f:
-    if alias_string in f.read():
-        print(f"{alias} already exists in {config_location}")
-        sys.exit(0)
-
-# Opening the config file in append mode and writing the alias to the file.
-with open(config_location, 'a', encoding="utf-8") as f:
-    f.write(f"{alias_string}\n")
+    subprocess.run(
+        ["fish", "-c", f"alias --save {alias} \"{command}\""], check=True, stdout=subprocess.DEVNULL
+    )
 
 print(f"added \"{alias_string}\" to shell config")
 
