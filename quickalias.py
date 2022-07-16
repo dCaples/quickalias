@@ -26,7 +26,9 @@ elif "fish" in process_id:
     SHELL = "fish"
     # Getting the path of the config.fish file.
     shell_config_path: str = os.path.join(
-        user_directory, '.config/fish/config.fish')
+        os.environ.get('XDG_CONFIG_HOME') or
+        os.path.join(user_directory, '.config'),
+        'fish/config.fish')
 else:
     # If the shell is not detected, it will default to fish.
     SHELL = "fish"
