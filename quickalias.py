@@ -13,13 +13,15 @@ process_id: str = os.readlink(f'/proc/{os.getppid()}/exe')
 
 if "bash" in process_id:
     SHELL = "bash"
-    # Getting the path of the bashrc.
+    # Getting the path of the .bashrc file.
     shell_config_path: str = os.path.join(user_directory, '.bashrc')
 
 elif "zsh" in process_id:
     SHELL = "zsh"
    # Getting the path of the .zshrc file.
-    shell_config_path: str = os.path.join(user_directory, '.zshrc')
+    shell_config_path: str = os.path.join(
+        os.environ.get('ZDOTDIR') or user_directory,
+        '.zshrc')
 elif "fish" in process_id:
     SHELL = "fish"
     # Getting the path of the config.fish file.
