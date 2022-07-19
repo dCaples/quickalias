@@ -22,14 +22,18 @@ def main() -> int:
         shell_config_path: str = os.path.join(user_directory, '.bashrc')
 
     elif "zsh" in process_id:
-        SHELL: str = "zsh"
-    # Getting the path of the .zshrc file.
-        shell_config_path: str = os.path.join(user_directory, '.zshrc')
+        SHELL = "zsh"
+
+        # Getting the path of the .zshrc file.
+        shell_config_path: str = os.path.join(
+            os.environ.get('ZDOTDIR') or user_directory, '.zshrc')
     elif "fish" in process_id:
-        SHELL: str = "fish"
+
+        SHELL = "fish"
         # Getting the path of the config.fish file.
         shell_config_path: str = os.path.join(
-            user_directory, '.config/fish/config.fish')
+            os.environ.get('XDG_CONFIG_HOME') or os.path.join(
+                user_directory, '.config'), 'fish/config.fish')
     else:
         # If the shell is not detected, it will default to fish.
         SHELL: str = "fish"
@@ -42,8 +46,8 @@ def main() -> int:
         config_location: str = f"{user_directory}/.config/fish/config.fish"
 
     # Asking the user to input the alias and the command.
-    alias: str = input('Enter alias for command: ')
-    command: str = input('Enter the command: ')
+    alias: str = input('enter alias for command: ')
+    command: str = input('enter the command: ')
 
     if SHELL in "bash" or SHELL in "zsh":
         alias_string: str = f"alias {alias}=\"{command}\""
@@ -62,11 +66,12 @@ def main() -> int:
     with open(config_location, 'a', encoding="utf-8") as file:
         file.write(f"{alias_string}\n")
 
-    print(f"Added \"{alias_string}\" to shell config")
+    print(f"added \"{alias_string}\" to shell config")
 
     source_command: str = f"source {config_location}"
     print(f"You can source the new changes with:\n\t{source_command}")
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
