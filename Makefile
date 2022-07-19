@@ -1,5 +1,5 @@
 install:
-	mkdir -p $DESTDIR $PREFIX/usr/local/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/usr/local/bin
 	install -Dm755 ./quickalias.py "$(DESTDIR)$(PREFIX)/usr/local/bin/quickalias"
 
 uninstall:
