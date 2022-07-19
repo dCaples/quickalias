@@ -5,12 +5,30 @@ This simple python script creates pemenant aliases so you don't have to open you
 import os
 import sys
 import subprocess
+import argparse
 
 
 def main() -> int:
     """
     the main method
     """
+    module_description: str = "This script creates pemenant aliases so you don't have to."
+    parser = argparse.ArgumentParser(description=module_description)
+    parser.add_argument(
+        "-a", "--alias", help="the alias for the command", required=False)
+    parser.add_argument("-c", "--command",
+                        help="the command to be aliased", required=False)
+    args = parser.parse_args()
+
+
+    if args.alias and args.command:
+        alias: str = args.alias
+        command: str = args.command
+    else:
+        # Asking the user to input the alias and the command.
+        alias: str = input('Enter alias for command: ')
+        command: str = input('Enter the command: ')
+
     # Getting the home directory of the user.
     user_directory: str = os.path.expanduser('~')
 
@@ -46,10 +64,6 @@ def main() -> int:
     else:
         config_location: str = f"{user_directory}/.config/fish/config.fish"
 
-    # Asking the user to input the alias and the command.
-    alias: str = input('Enter alias for command: ')
-    command: str = input('Enter the command: ')
-
     if SHELL in "bash" or SHELL in "zsh":
         alias_string: str = f"alias {alias}=\"{command}\""
 
@@ -57,7 +71,7 @@ def main() -> int:
         # if it does, it will not add it again.
         with open(config_location, encoding="utf-8") as file:
             if alias_string in file.read():
-                print(f"{alias} already exists in {config_location}")
+                print(f"\n{alias} already exists in {config_location}")
                 sys.exit(0)
 
         # Opening the config file in append mode and writing the alias to the file.
@@ -69,7 +83,7 @@ def main() -> int:
             ["fish", "-c", f"alias --save {alias} \"{command}\""], check=True,
             stdout=subprocess.DEVNULL)
 
-    print(f"Added \"{alias_string}\" to shell config")
+    print(f"\nAdded \"{alias_string}\" to shell config")
 
     source_command: str = f"source {config_location}"
     print(f"You can source the new changes with:\n\t{source_command}")

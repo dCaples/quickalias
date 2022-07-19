@@ -11,8 +11,29 @@ This python script creates permanent aliases so you don't have to open your shel
 1. run the folowing to install:
 
 ```bash
-sudo ./install
+sudo make install
 ```
 
-2. run `quickalias` to create an alias, then source your shell config.
+2. run `quickalias` in interactive mode:
+
+  ```shell
+  $ quickalias
+  Enter alias for command: hello
+  Enter the command: echo hello
+
+  Added "alias hello="echo hello"" to shell config
+You can source the new changes with:
+      source /home/<user>/.zshrc
+  ```
+
+or using arguments:
+
+  ```shell
+  $ quickalias --alias "hello" --command "echo hello"
+
+Added "alias hello="echo hello"" to shell config
+You can source the new changes with:
+        source /home/<user>/.zshrc
+  ```
+
 3. Profit!!
