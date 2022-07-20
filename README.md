@@ -16,7 +16,7 @@ sudo make install
 
 2. run `quickalias` in interactive mode:
 
-  ```shell
+  ```
   $ quickalias
   Enter alias for command: hello
   Enter the command: echo hello
@@ -28,7 +28,7 @@ You can source the new changes with:
 
 or using arguments:
 
-  ```shell
+  ```
   $ quickalias --alias "hello" --command "echo hello"
 
 Added "alias hello="echo hello"" to shell config
