@@ -8,7 +8,7 @@ url="https://github.com/dCaples/quickalias"
 license=("GPL3")
 provides=("quickalias")
 depends=("python3")
-source=("quickalias.py" "install.sh")
+source=("quickalias.py" "Makefile")
 sha256sums=('SKIP' 'SKIP')
 
 pkgver() {
