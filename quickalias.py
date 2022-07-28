@@ -12,6 +12,8 @@ def main() -> int:
     """
     the main method
     """
+
+    # Creating a description for the script and then creating a parser for the arguments.
     module_description: str = "This script creates pemenant aliases so you don't have to."
     parser = argparse.ArgumentParser(description=module_description)
     parser.add_argument(
@@ -79,6 +81,7 @@ def main() -> int:
             file.write(f"{alias_string}\n")
 
     else:
+        # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
         subprocess.run(
             ["fish", "-c", f"alias --save {alias} \"{command}\""], check=True,
             stdout=subprocess.DEVNULL)
