@@ -18,8 +18,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=module_description)
     parser.add_argument(
         "-a", "--alias", help="the alias for the command", required=False)
+    parser.add_argument('alias', nargs='?',default=argparse.SUPPRESS)
     parser.add_argument("-c", "--command",
                         help="the command to be aliased", required=False)
+    parser.add_argument('command', nargs='?',default=argparse.SUPPRESS)
     args = parser.parse_args()
 
 
