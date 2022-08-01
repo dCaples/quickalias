@@ -40,27 +40,27 @@ def main() -> int:
     process_id: str = os.readlink(f'/proc/{os.getppid()}/exe')
 
     if "bash" in process_id:
-        SHELL: str = "bash"
+        shell: str = "bash"
         # Getting the path of the bashrc.
         shell_config_path: str = os.path.join(user_directory, '.bashrc')
 
     elif "zsh" in process_id:
-        SHELL = "zsh"
+        shell = "zsh"
 
         # Getting the path of the .zshrc file.
         shell_config_path: str = os.path.join(
             os.environ.get('ZDOTDIR') or user_directory, '.zshrc')
     elif "fish" in process_id:
 
-        SHELL = "fish"
+        shell = "fish"
         # Getting the path of the config.fish file.
         shell_config_path: str = os.path.join(
             os.environ.get('XDG_CONFIG_HOME') or os.path.join(
                 user_directory, '.config'), 'fish/config.fish')
     else:
         # If the shell is not detected, it will default to fish.
-        SHELL: str = "fish"
-        print("Shell not detected. Defaulting to fish.")
+        shell: str = "fish"
+        print("shell not detected. Defaulting to fish.")
         shell_config_path: str = None
 
     if shell_config_path is not None:
@@ -68,7 +68,7 @@ def main() -> int:
     else:
         config_location: str = f"{user_directory}/.config/fish/config.fish"
 
-    if SHELL in "bash" or SHELL in "zsh":
+    if shell in "bash" or shell in "zsh":
         alias_string: str = f"alias {alias}=\"{command}\""
 
         # This is checking if the alias already exists in the config file.

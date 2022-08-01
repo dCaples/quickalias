@@ -9,7 +9,7 @@ package: clean
 
 
 upload: package
-	twine upload dist/*
+	twine upload dist/* --repository quickalias
 
 clean:
 	rm -rf dist build *.egg-info
