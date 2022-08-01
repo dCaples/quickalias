@@ -8,9 +8,27 @@ This python script creates permanent aliases so you don't have to open your shel
 
 ## Installation
 
-1. run the folowing to install:
+You have three ways to install this program.  
+
+You can install with the pypi package (with pip):
 
 ```bash
+pip install quickalias
+```
+
+You can install with the PKGBUILD (for Arch users):
+
+```bash
+git clone https://github.com/dCaples/quickalias
+cd quickalias
+makepkg -si
+```
+
+Or you can install with make:
+
+```bash
+git clone https://github.com/dCaples/quickalias
+cd quickalias
 sudo make install
 ```
 
