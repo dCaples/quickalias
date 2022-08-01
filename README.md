@@ -6,6 +6,13 @@ This python script creates permanent aliases so you don't have to open your shel
 
 * python3
 
+## Currently Supported Shells
+
+* Bash
+* Zsh
+* Fish
+* Ksh
+
 ## Installation
 
 You have three ways to install this program.  

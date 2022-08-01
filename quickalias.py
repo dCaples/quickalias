@@ -57,18 +57,35 @@ def main() -> int:
         shell_config_path: str = os.path.join(
             os.environ.get('XDG_CONFIG_HOME') or os.path.join(
                 user_directory, '.config'), 'fish/config.fish')
+    elif "ksh" in process_id:
+        shell = "ksh"
+        # Getting the path of the .kshrc file.
+        shell_config_path: str = os.environ.get('ENV') or os.path.join(user_directory, '.kshrc')
     else:
         # If the shell is not detected, it will default to fish.
-        shell: str = "fish"
-        print("shell not detected. Defaulting to fish.")
+        shell: str = "bash"
+        print("shell not detected. Defaulting to bash.")
         shell_config_path: str = None
 
     if shell_config_path is not None:
         config_location: str = shell_config_path
     else:
-        config_location: str = f"{user_directory}/.config/fish/config.fish"
+        config_location: str = f"{user_directory}/.bashrc"
 
     if shell in "bash" or shell in "zsh":
+        alias_string: str = f"alias {alias}=\"{command}\""
+
+        # This is checking if the alias already exists in the config file.
+        # if it does, it will not add it again.
+        with open(config_location, encoding="utf-8") as file:
+            if alias_string in file.read():
+                print(f"\n{alias} already exists in {config_location}")
+                sys.exit(0)
+
+        # Opening the config file in append mode and writing the alias to the file.
+        with open(config_location, 'a', encoding="utf-8") as file:
+            file.write(f"{alias_string}\n")
+    elif shell in "ksh":
         alias_string: str = f"alias {alias}=\"{command}\""
 
         # This is checking if the alias already exists in the config file.
