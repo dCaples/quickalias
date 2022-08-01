@@ -18,6 +18,8 @@ sudo make install
 
 you may run `quickalias` in interactive mode:
 
+> *This example is using the zsh shell*
+
   ```
   $ quickalias
   Enter alias for command: hello
@@ -28,10 +30,24 @@ You can source the new changes with:
       source /home/<user>/.zshrc
   ```
 
-or using arguments:
+using flags:
+
+> *This example is using the zsh shell*
 
   ```
   $ quickalias --alias "hello" --command "echo hello"
+
+Added "alias hello="echo hello"" to shell config
+You can source the new changes with:
+        source /home/<user>/.zshrc
+  ```
+
+or using positional arguments:
+
+> *This example is using the zsh shell*
+
+  ```
+  $ quickalias hello "echo hello"
 
 Added "alias hello="echo hello"" to shell config
 You can source the new changes with:
