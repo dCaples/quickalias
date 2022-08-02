@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This simple python script creates pemenant aliases so you don't have to open your shell config file
+This simple python script creates permenant aliases so you don't have to open your shell config file
 """
 import os
 import sys
@@ -9,12 +9,71 @@ import argparse
 
 
 class QuickAlias:
+    """
+    Creates permenant aliases
+    """
     def __init__(self):
         pass
 
     def detect_shell(self) -> str:
-        """Detects the process calling the script"""
-        return os.environ.get("SHELL") or os.readlink(f"/proc/{os.getppid()}/exe")
+        """ Detects the process calling the script """
+        return os.readlink(f'/proc/{os.getppid()}/exe') or os.environ.get("SHELL")
+
+    def get_home_dir(self) -> str:
+        """ Returns the home directory of the user """
+        return os.environ.get("HOME") or os.path.expanduser('~')
+
+    def get_shell_config_file(self, shell: str, home: str) -> str:
+        """ Returns the shell config file path """
+        if "bash" in shell:
+            # Getting the path of the bashrc.
+            shell_config_path: str = os.path.join(home, '.bashrc')
+
+        elif "zsh" in shell:
+
+            # Getting the path of the .zshrc file.
+            shell_config_path: str = os.path.join(
+                os.environ.get('ZDOTDIR') or home, '.zshrc')
+        elif "fish" in shell:
+
+            # Getting the path of the config.fish file.
+            shell_config_path: str = os.path.join(
+                os.environ.get('XDG_CONFIG_HOME') or os.path.join(
+                    home, '.config'), 'fish/config.fish')
+        elif "ksh" in shell:
+            # Getting the path of the .kshrc file.
+            shell_config_path: str = os.environ.get(
+                'ENV') or os.path.join(home, '.kshrc')
+        else:
+            # If the shell is not detected, it will default to fish.
+            print("shell not detected. Defaulting to bash.")
+            shell_config_path: str = None
+
+        return shell_config_path
+
+    def generate_alias_command(self, alias: str, command: str, shell: str):
+        """ Generates the alias command """
+        if "bash" in shell or "zsh" in shell or "ksh" in shell:
+            alias_command: str = f"alias {alias}=\"{command}\""
+        elif "fish" in shell:
+            return ["fish", "-c", f"alias --save {alias} \"{command}\""]
+        return alias_command
+
+    def write_alias(self, alias_command: str, config_file: str)->any:
+        """ Writes the alias command to the config file """
+        with open(config_file, encoding="utf-8") as file:
+            if alias_command in file.read():
+                return -1
+
+        if os.path.isdir(config_file):
+            return -2
+
+        if not os.path.exists(config_file):
+            open(config_file, "w", encoding="utf-8").close()
+
+        with open(config_file, 'a', encoding="utf-8") as file:
+            file.write(f"{alias_command}\n")
+        return 0
 
 
 def main() -> int:
@@ -49,87 +108,65 @@ def main() -> int:
         command: str = input("Enter the command: ")
 
     # Getting the home directory of the user.
-    user_directory: str = os.path.expanduser("~")
+    user_directory: str = quickalias.get_home_dir()
+
+    if user_directory == '':
+        print('Could not find home directory', file=sys.stderr)
+        return 1
 
     # Getting the process id of the parent process from proc.
-    process_id: str = quickalias.detect_shell()
+    shell: str = quickalias.detect_shell()
 
-    if "bash" in process_id:
+    if shell == '':
+        print('Could not detect shell', file=sys.stderr)
+        return 1
+
+    # Getting the path of the shell config file.
+    shell_config: str = quickalias.get_shell_config_file(
+        shell, user_directory)
+
+    if shell_config is None:
         shell: str = "bash"
-        # Getting the path of the bashrc.
-        shell_config_path: str = os.path.join(user_directory, ".bashrc")
+        shell_config: str = f"{user_directory}/.bashrc"
 
-    elif "zsh" in process_id:
-        shell = "zsh"
+    if "bash" in shell or "zsh" in shell or "ksh" in shell:
 
-        # Getting the path of the .zshrc file.
-        shell_config_path: str = os.path.join(
-            os.environ.get("ZDOTDIR") or user_directory, ".zshrc"
-        )
-    elif "fish" in process_id:
+        # generating the alias command.
+        alias_string: str = quickalias.generate_alias_command(
+            alias, command, shell)
 
-        shell = "fish"
-        # Getting the path of the config.fish file.
-        shell_config_path: str = os.path.join(
-            os.environ.get("XDG_CONFIG_HOME")
-            or os.path.join(user_directory, ".config"),
-            "fish/config.fish",
-        )
-    elif "ksh" in process_id:
-        shell = "ksh"
-        # Getting the path of the .kshrc file.
-        shell_config_path: str = os.environ.get("ENV") or os.path.join(
-            user_directory, ".kshrc"
-        )
-    else:
-        # If the shell is not detected, it will default to fish.
-        shell: str = "bash"
-        print("shell not detected. Defaulting to bash.")
-        shell_config_path: str = None
+        # Writing the alias to the config file.
+        alias_written: int = quickalias.write_alias(alias_string, shell_config)
 
-    if shell_config_path is not None:
-        config_location: str = shell_config_path
-    else:
-        config_location: str = f"{user_directory}/.bashrc"
+        # if alias already exists, it will exit.
+        if alias_written == -1:
+            print(f"\n{alias} already exists in {shell_config}",
+                  file=sys.stderr)
+            return 0
 
-    if shell in "bash" or shell in "zsh":
-        alias_string: str = f'alias {alias}="{command}"'
-
-        # This is checking if the alias already exists in the config file.
-        # if it does, it will not add it again.
-        with open(config_location, encoding="utf-8") as file:
-            if alias_string in file.read():
-                print(f"\n{alias} already exists in {config_location}")
-                sys.exit(0)
+        if alias_written == -2:
+            print(f"\n{shell_config} is a directory", file=sys.stderr)
+            return 1
 
         # Opening the config file in append mode and writing the alias to the file.
-        with open(config_location, "a", encoding="utf-8") as file:
-            file.write(f"{alias_string}\n")
-    elif shell in "ksh":
-        alias_string: str = f'alias {alias}="{command}"'
-
-        # This is checking if the alias already exists in the config file.
-        # if it does, it will not add it again.
-        with open(config_location, encoding="utf-8") as file:
-            if alias_string in file.read():
-                print(f"\n{alias} already exists in {config_location}")
-                sys.exit(0)
-
-        # Opening the config file in append mode and writing the alias to the file.
-        with open(config_location, "a", encoding="utf-8") as file:
+        with open(shell_config, 'a', encoding="utf-8") as file:
             file.write(f"{alias_string}\n")
 
-    else:
+        print(f"\nAdded \"{alias_string}\" to shell config")
+
+    elif "fish" in shell:
         # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
-        subprocess.run(
-            ["fish", "-c", f'alias --save {alias} "{command}"'],
-            check=True,
-            stdout=subprocess.DEVNULL,
+        alias_command: str = quickalias.generate_alias_command(
+            alias, command, shell
         )
 
-    print(f'\nAdded "{alias_string}" to shell config')
+        subprocess.run(alias_command, check=True, stdout=subprocess.DEVNULL)
+        print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
+    else:
+        print("Shell not detected, exiting.", file=sys.stderr)
+        return 1
 
-    source_command: str = f"source {config_location}"
+    source_command: str = f"source {shell_config}"
     print(f"You can source the new changes with:\n\t{source_command}")
     return 0
 
