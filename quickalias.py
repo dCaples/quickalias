@@ -7,11 +7,21 @@ import sys
 import subprocess
 import argparse
 
+class QuickAlias:
+    def __init__(self):
+        pass
+
+    def detect_shell(self) -> str:
+        """ Detects the process calling the script """
+        return os.environ.get("SHELL") or os.readlink(f'/proc/{os.getppid()}/exe')
 
 def main() -> int:
     """
     the main method
     """
+
+    # Creating an instance of the class `QuickAlias`
+    quickalias = QuickAlias()
 
     # Creating a description for the script and then creating a parser for the arguments.
     module_description: str = "This script creates pemenant aliases so you don't have to."
@@ -37,7 +47,7 @@ def main() -> int:
     user_directory: str = os.path.expanduser('~')
 
     # Getting the process id of the parent process from proc.
-    process_id: str = os.readlink(f'/proc/{os.getppid()}/exe')
+    process_id: str = quickalias.detect_shell()
 
     if "bash" in process_id:
         shell: str = "bash"
