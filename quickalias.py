@@ -47,7 +47,10 @@ class QuickAlias:
             shell_config_path: str = os.environ.get(
                 'ENV') or os.path.join(home, '.kshrc')
         elif "tcsh" in shell:
-            shell_config_path:str = os.path.join(home, '.tcshrc')
+            shell_config_path: str = os.path.join(home, '.tcshrc')
+        elif "oh" in shell:
+            shell_config_path: str = os.path.expanduser(os.environ.get(
+                "OH_RC")) or os.path.join(home, '.oh-rc')
         else:
             # If the shell is not detected, it will default to fish.
             print("shell not detected. Defaulting to bash.")
@@ -61,15 +64,16 @@ class QuickAlias:
             alias_command: str = f"alias {alias}=\"{command}\""
         elif "tcsh" in shell:
             alias_command: str = f"alias {alias} \"{command}\""
+        elif "oh" in shell:
+            alias_command: str = "define " + \
+                f"{alias}: method ((args)) " + \
+                "{\n"+f"{command} (splice $args)\n"+"}"
         elif "fish" in shell:
             return ["fish", "-c", f"alias --save {alias} \"{command}\""]
         return alias_command
 
     def write_alias(self, alias_command: str, config_file: str) -> any:
         """ Writes the alias command to the config file """
-        with open(config_file, encoding="utf-8") as file:
-            if alias_command in file.read():
-                return -1
 
         if os.path.isdir(config_file):
             return -2
@@ -77,6 +81,10 @@ class QuickAlias:
         if not os.path.exists(config_file):
             with open(config_file, "w", encoding="utf-8") as file:
                 pass
+
+        with open(config_file, encoding="utf-8") as file:
+            if alias_command in file.read():
+                return -1
 
         with open(config_file, 'a', encoding="utf-8") as file:
             file.write(f"{alias_command}\n")
@@ -133,7 +141,17 @@ def main() -> int:
         shell: str = "bash"
         shell_config: str = f"{user_directory}/.bashrc"
 
-    if "bash" in shell or "zsh" in shell or "ksh" in shell or "tcsh" in shell:
+    if "fish" in shell:
+
+        # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
+        alias_command: str = quickalias.generate_alias_command(
+            alias, command, shell
+        )
+
+        subprocess.run(alias_command, check=True, stdout=subprocess.DEVNULL)
+        print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
+
+    else:
 
         # generating the alias command.
         alias_string: str = quickalias.generate_alias_command(
@@ -157,19 +175,6 @@ def main() -> int:
             file.write(f"{alias_string}\n")
 
         print(f"\nAdded \"{alias_string}\" to shell config")
-
-    elif "fish" in shell:
-
-        # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
-        alias_command: str = quickalias.generate_alias_command(
-            alias, command, shell
-        )
-
-        subprocess.run(alias_command, check=True, stdout=subprocess.DEVNULL)
-        print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
-    else:
-        print("Shell not detected, exiting.", file=sys.stderr)
-        return 1
 
     source_command: str = f"source {shell_config}"
     print(f"You can source the new changes with:\n\t{source_command}")
