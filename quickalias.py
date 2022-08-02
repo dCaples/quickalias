@@ -14,7 +14,7 @@ class QuickAlias:
 
     def detect_shell(self) -> str:
         """ Detects the process calling the script """
-        return os.environ.get("SHELL") or os.readlink(f'/proc/{os.getppid()}/exe')
+        return os.readlink(f'/proc/{os.getppid()}/exe') or os.environ.get("SHELL")
 
     def get_home_dir(self) -> str:
         """ Returns the home directory of the user """
@@ -47,6 +47,30 @@ class QuickAlias:
             shell_config_path: str = None
 
         return shell_config_path
+
+    def generate_alias_command(self, alias: str, command: str, shell: str):
+        """ Generates the alias command """
+        if "bash" in shell or "zsh" in shell or "ksh" in shell:
+            alias_command: str = f"alias {alias}=\"{command}\""
+        elif "fish" in shell:
+            return ["fish", "-c", f"alias --save {alias} \"{command}\""]
+        return alias_command
+
+    def write_alias(self, alias_command: str, config_file: str):
+        """ Writes the alias command to the config file """
+        with open(config_file, encoding="utf-8") as file:
+            if alias_command in file.read():
+                return -1
+
+        if os.path.isdir(config_file):
+            return -2
+
+        if not os.path.exists(config_file):
+            open(config_file, "w", encoding="utf-8").close()
+
+        with open(config_file, 'a', encoding="utf-8") as file:
+            file.write(f"{alias_command}\n")
+        return 0
 
 
 def main() -> int:
@@ -97,44 +121,37 @@ def main() -> int:
         shell: str = "bash"
         shell_config: str = f"{user_directory}/.bashrc"
 
-    if "bash" in shell or "zsh" in shell:
-        alias_string: str = f"alias {alias}=\"{command}\""
-        print(alias_string)
+    if "bash" in shell or "zsh" in shell or "ksh" in shell:
+        alias_string: str = quickalias.generate_alias_command(
+            alias, command, shell)
         # This is checking if the alias already exists in the config file.
         # if it does, it will not add it again.
-        with open(shell_config, encoding="utf-8") as file:
-            if alias_string in file.read():
-                print(f"\n{alias} already exists in {shell_config}",
-                      file=sys.stderr)
-                sys.exit(0)
+        alias_written: int = quickalias.write_alias(alias_string, shell_config)
+        if alias_written == -1:
+            print(f"\n{alias} already exists in {shell_config}",
+                  file=sys.stderr)
+            return 0
+
+        if alias_written == -2:
+            print(f"\n{shell_config} is a directory", file=sys.stderr)
+            return 1
 
         # Opening the config file in append mode and writing the alias to the file.
         with open(shell_config, 'a', encoding="utf-8") as file:
             file.write(f"{alias_string}\n")
-    elif shell in "ksh":
-        alias_string: str = f"alias {alias}=\"{command}\""
 
-        # This is checking if the alias already exists in the config file.
-        # if it does, it will not add it again.
-        with open(shell_config, encoding="utf-8") as file:
-            if alias_string in file.read():
-                print(f"\n{alias} already exists in {shell_config}",
-                      file=sys.stderr)
-                sys.exit(0)
-
-        # Opening the config file in append mode and writing the alias to the file.
-        with open(shell_config, 'a', encoding="utf-8") as file:
-            file.write(f"{alias_string}\n")
+        print(f"\nAdded \"{alias_string}\" to shell config")
 
     elif "fish" in shell:
         # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
-        subprocess.run(
-            ["fish", "-c", f"alias --save {alias} \"{command}\""], check=True,
-            stdout=subprocess.DEVNULL)
+        alias_command: str = quickalias.generate_alias_command(
+            alias, command, shell
+        )
+
+        subprocess.run(alias_command, check=True, stdout=subprocess.DEVNULL)
+        print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
     else:
         print("Shell not detected, exiting.", file=sys.stderr)
-
-    print(f"\nAdded \"{alias_string}\" to shell config")
 
     source_command: str = f"source {shell_config}"
     print(f"You can source the new changes with:\n\t{source_command}")
