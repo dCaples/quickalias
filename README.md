@@ -117,10 +117,11 @@ $ python3 test.py
 
 The functions avalible in the module are the following:
 
-* `get_home_dir()` - returns the home directory of the user calling the function
-* `get_shell_config_file(home: str)` - Attempts to determine the config file for a provided shell.
-* `generate_alias_command(alias: str, command: str, shell: str)` - Take an alias and a command to be aliased and returns an alias command appropriate for the shell.
-* `write_alias(alias_command: str, config_file: str)` - Intended to write the output of `generate_alias_command()` to the location provided by `get_shell_config_file()`
+* `detect_shell() -> str` - Returns the process calling the program
+* `get_home_dir() -> str` - Returns the home directory of the user calling the function
+* `get_shell_config_file(home: str) -> str` - Attempts to determine the config file for a provided shell.
+* `generate_alias_command(alias: str, command: str, shell: str) -> any` - Take an alias and a command to be aliased and returns an alias command appropriate for the shell. *will return a list to be passed to subprocess.run if the shell is fish*
+* `write_alias(alias_command: str, config_file: str) -> str` - Intended to write the output of `generate_alias_command()` to the location provided by `get_shell_config_file()`
 
 ## Contributing
 

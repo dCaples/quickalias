@@ -59,7 +59,7 @@ class QuickAlias:
             return ["fish", "-c", f"alias --save {alias} \"{command}\""]
         return alias_command
 
-    def write_alias(self, alias_command: str, config_file: str):
+    def write_alias(self, alias_command: str, config_file: str)->any:
         """ Writes the alias command to the config file """
         with open(config_file, encoding="utf-8") as file:
             if alias_command in file.read():
