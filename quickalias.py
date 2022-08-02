@@ -95,7 +95,7 @@ class QuickAlias:
                 if alias_command in file.read():
                     return -1
 
-        with open(config_file, 'w', encoding="utf-8") as file:
+        with open(config_file, 'a', encoding="utf-8") as file:
             file.write(f"{alias_command}\n")
         return 0
 
