@@ -41,16 +41,27 @@ class QuickAlias:
             # Getting the path of the config.fish file.
             shell_config_path: str = os.path.join(
                 os.environ.get('XDG_CONFIG_HOME') or os.path.join(
-                    home, '.config'), 'fish/config.fish')
+                home, '.config'), 'fish/config.fish')
+
         elif "ksh" in shell:
             # Getting the path of the .kshrc file.
             shell_config_path: str = os.environ.get(
                 'ENV') or os.path.join(home, '.kshrc')
+
         elif "tcsh" in shell:
             shell_config_path: str = os.path.join(home, '.tcshrc')
+
         elif "oh" in shell:
             shell_config_path: str = os.path.expanduser(os.environ.get(
                 "OH_RC")) or os.path.join(home, '.oh-rc')
+
+        elif "pwsh" in shell or "powershell" in shell:
+            shell_config_path: str = subprocess.run(
+                [f"{shell}", "-c", "$profile"], stdout=subprocess.PIPE, check=True
+            ).stdout.decode("utf-8").split("\n")[0]
+            shell = "powershell"
+            print(shell_config_path)
+
         else:
             # If the shell is not detected, it will default to fish.
             print("shell not detected. Defaulting to bash.")
@@ -68,6 +79,8 @@ class QuickAlias:
             alias_command: str = "define " + \
                 f"{alias}: method ((args)) " + \
                 "{\n"+f"{command} (splice $args)\n"+"}"
+        elif "powershell" in shell:
+            alias_command: str = f"Set-Alias {alias} \"{command}\""
         elif "fish" in shell:
             return ["fish", "-c", f"alias --save {alias} \"{command}\""]
         return alias_command
@@ -147,6 +160,32 @@ def main() -> int:
         subprocess.run(alias_command, check=True, stdout=subprocess.DEVNULL)
         print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
 
+    elif "powershell" in shell:
+        shell_config_list = shell_config.split("/")[:-1]
+
+        shell_config_dir :str= "/".join(shell_config_list)
+        if not os.path.exists(shell_config_dir):
+            os.makedirs(shell_config_dir, exist_ok=True)
+
+        # generating the alias command.
+        alias_string: str = quickalias.generate_alias_command(
+            alias, command, shell)
+
+        # Writing the alias to the config file.
+        alias_written: int = quickalias.write_alias(alias_string, shell_config)
+
+        # if alias already exists, it will exit.
+        if alias_written == -1:
+            print(f"\n{alias} already exists in {shell_config}",
+                  file=sys.stderr)
+            return 0
+
+        if alias_written == -2:
+            print(f"\n{shell_config} is a directory", file=sys.stderr)
+            return 1
+
+        print(f"\nAdded \"{alias_string}\" to shell config")
+
     else:
 
         # generating the alias command.
@@ -166,11 +205,10 @@ def main() -> int:
             print(f"\n{shell_config} is a directory", file=sys.stderr)
             return 1
 
-
         print(f"\nAdded \"{alias_string}\" to shell config")
 
-    source_command: str = f"source {shell_config}"
-    print(f"You can source the new changes with:\n\t{source_command}")
+        source_command: str = f"source {shell_config}"
+        print(f"You can source the new changes with:\n\t{source_command}")
     return 0
 
 
