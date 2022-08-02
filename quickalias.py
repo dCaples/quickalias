@@ -9,6 +9,9 @@ import argparse
 
 
 class QuickAlias:
+    """
+    Creates permenant aliases
+    """
     def __init__(self):
         pass
 
@@ -92,6 +95,7 @@ def main() -> int:
     parser.add_argument('command', nargs='?', default=argparse.SUPPRESS)
     args = parser.parse_args()
 
+    # Getting the desired alias and command.
     if args.alias and args.command:
         alias: str = args.alias
         command: str = args.command
@@ -114,6 +118,7 @@ def main() -> int:
         print('Could not detect shell', file=sys.stderr)
         return 1
 
+    # Getting the path of the shell config file.
     shell_config: str = quickalias.get_shell_config_file(
         shell, user_directory)
 
@@ -122,11 +127,15 @@ def main() -> int:
         shell_config: str = f"{user_directory}/.bashrc"
 
     if "bash" in shell or "zsh" in shell or "ksh" in shell:
+
+        # generating the alias command.
         alias_string: str = quickalias.generate_alias_command(
             alias, command, shell)
-        # This is checking if the alias already exists in the config file.
-        # if it does, it will not add it again.
+
+        # Writing the alias to the config file.
         alias_written: int = quickalias.write_alias(alias_string, shell_config)
+
+        # if alias already exists, it will exit.
         if alias_written == -1:
             print(f"\n{alias} already exists in {shell_config}",
                   file=sys.stderr)
@@ -152,6 +161,7 @@ def main() -> int:
         print(f"Ran command \"fish -c alias --save {alias} \"{command}\"\"")
     else:
         print("Shell not detected, exiting.", file=sys.stderr)
+        return 1
 
     source_command: str = f"source {shell_config}"
     print(f"You can source the new changes with:\n\t{source_command}")
