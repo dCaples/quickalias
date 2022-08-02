@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This simple python script creates pemenant aliases so you don't have to open your shell config file
+This simple python script creates permenant aliases so you don't have to open your shell config file
 """
 import os
 import sys
