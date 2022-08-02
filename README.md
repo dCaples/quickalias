@@ -6,17 +6,44 @@ This python script creates permanent aliases so you don't have to open your shel
 
 * python3
 
+## Currently Supported Shells
+
+* Bash
+* Zsh
+* Fish
+* Ksh
+
 ## Installation
 
-1. run the folowing to install:
+You have three ways to install this program.  
+
+You can install with the pypi package (with pip):
 
 ```bash
+pip install quickalias
+```
+
+You can install with the PKGBUILD (for Arch users):
+
+```bash
+git clone https://github.com/dCaples/quickalias
+cd quickalias
+makepkg -si
+```
+
+Or you can install with make:
+
+```bash
+git clone https://github.com/dCaples/quickalias
+cd quickalias
 sudo make install
 ```
 
 ## Usage
 
 you may run `quickalias` in interactive mode:
+
+> *This example is using the zsh shell*
 
   ```
   $ quickalias
@@ -28,10 +55,24 @@ You can source the new changes with:
       source /home/<user>/.zshrc
   ```
 
-or using arguments:
+using flags:
+
+> *This example is using the zsh shell*
 
   ```
   $ quickalias --alias "hello" --command "echo hello"
+
+Added "alias hello="echo hello"" to shell config
+You can source the new changes with:
+        source /home/<user>/.zshrc
+  ```
+
+or using positional arguments:
+
+> *This example is using the zsh shell*
+
+  ```
+  $ quickalias hello "echo hello"
 
 Added "alias hello="echo hello"" to shell config
 You can source the new changes with:
