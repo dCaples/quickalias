@@ -8,10 +8,10 @@ This python script creates permanent aliases so you don't have to open your shel
 
 ## Currently Supported Shells
 
-* Bash
-* Zsh
-* Fish
-* Ksh
+* bash
+* zsh
+* fish
+* ksh
 * tcsh
 
 ## Installation
