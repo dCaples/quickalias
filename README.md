@@ -12,6 +12,7 @@ This python script creates permanent aliases so you don't have to open your shel
 * Zsh
 * Fish
 * Ksh
+* tcsh
 
 ## Installation
 

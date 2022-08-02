@@ -18,11 +18,12 @@ class QuickAlias:
 
     def detect_shell(self) -> str:
         """ Detects the process calling the script """
-        return os.readlink(f'/proc/{os.getppid()}/exe') or os.environ.get("SHELL")
+        return (os.readlink(f'/proc/{os.getppid()}/exe') or os.environ.get("shell") or
+                os.environ.get("SHELL"))
 
     def get_home_dir(self) -> str:
         """ Returns the home directory of the user """
-        return os.environ.get("HOME") or os.path.expanduser('~')
+        return os.environ.get("HOME") or os.environ.get("home") or os.path.expanduser('~')
 
     def get_shell_config_file(self, shell: str, home: str) -> str:
         """ Returns the shell config file path """
@@ -45,6 +46,8 @@ class QuickAlias:
             # Getting the path of the .kshrc file.
             shell_config_path: str = os.environ.get(
                 'ENV') or os.path.join(home, '.kshrc')
+        elif "tcsh" in shell:
+            shell_config_path:str = os.path.join(home, '.tcshrc')
         else:
             # If the shell is not detected, it will default to fish.
             print("shell not detected. Defaulting to bash.")
@@ -56,6 +59,8 @@ class QuickAlias:
         """ Generates the alias command """
         if "bash" in shell or "zsh" in shell or "ksh" in shell:
             alias_command: str = f"alias {alias}=\"{command}\""
+        elif "tcsh" in shell:
+            alias_command: str = f"alias {alias} \"{command}\""
         elif "fish" in shell:
             return ["fish", "-c", f"alias --save {alias} \"{command}\""]
         return alias_command
@@ -128,7 +133,7 @@ def main() -> int:
         shell: str = "bash"
         shell_config: str = f"{user_directory}/.bashrc"
 
-    if "bash" in shell or "zsh" in shell or "ksh" in shell:
+    if "bash" in shell or "zsh" in shell or "ksh" in shell or "tcsh" in shell:
 
         # generating the alias command.
         alias_string: str = quickalias.generate_alias_command(
