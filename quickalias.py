@@ -94,6 +94,11 @@ class QuickAlias:
             with open(config_file, encoding="utf-8") as file:
                 if alias_command in file.read():
                     return -1
+        else: # if the file doesn't exist, create it
+            print(f"no {config_file} exists. Creating")
+
+        with open(config_file, 'w', encoding="utf-8") as file:
+            pass
 
         with open(config_file, 'a', encoding="utf-8") as file:
             file.write(f"{alias_command}\n")
