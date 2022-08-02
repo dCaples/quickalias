@@ -7,6 +7,7 @@ import sys
 import subprocess
 import argparse
 
+
 class QuickAlias:
     def __init__(self):
         pass
@@ -14,6 +15,11 @@ class QuickAlias:
     def detect_shell(self) -> str:
         """ Detects the process calling the script """
         return os.environ.get("SHELL") or os.readlink(f'/proc/{os.getppid()}/exe')
+
+    def get_home_dir(self) -> str:
+        """ Returns the home directory of the user """
+        return os.environ.get("HOME") or os.path.expanduser('~')
+
 
 def main() -> int:
     """
@@ -28,12 +34,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=module_description)
     parser.add_argument(
         "-a", "--alias", help="the alias for the command", required=False)
-    parser.add_argument('alias', nargs='?',default=argparse.SUPPRESS)
+    parser.add_argument('alias', nargs='?', default=argparse.SUPPRESS)
     parser.add_argument("-c", "--command",
                         help="the command to be aliased", required=False)
-    parser.add_argument('command', nargs='?',default=argparse.SUPPRESS)
+    parser.add_argument('command', nargs='?', default=argparse.SUPPRESS)
     args = parser.parse_args()
-
 
     if args.alias and args.command:
         alias: str = args.alias
@@ -44,10 +49,18 @@ def main() -> int:
         command: str = input('Enter the command: ')
 
     # Getting the home directory of the user.
-    user_directory: str = os.path.expanduser('~')
+    user_directory: str = quickalias.get_home_dir()
+
+    if user_directory == '':
+        print('Could not find home directory', file=sys.stderr)
+        return 1
 
     # Getting the process id of the parent process from proc.
     process_id: str = quickalias.detect_shell()
+
+    if process_id == '':
+        print('Could not detect shell', file=sys.stderr)
+        return 1
 
     if "bash" in process_id:
         shell: str = "bash"
@@ -70,7 +83,8 @@ def main() -> int:
     elif "ksh" in process_id:
         shell = "ksh"
         # Getting the path of the .kshrc file.
-        shell_config_path: str = os.environ.get('ENV') or os.path.join(user_directory, '.kshrc')
+        shell_config_path: str = os.environ.get(
+            'ENV') or os.path.join(user_directory, '.kshrc')
     else:
         # If the shell is not detected, it will default to fish.
         shell: str = "bash"
