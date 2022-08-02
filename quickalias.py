@@ -69,7 +69,7 @@ class QuickAlias:
 
         return shell_config_path
 
-    def generate_alias_command(self, alias: str, command: str, shell: str):
+    def generate_alias_command(self, alias: str, command: str, shell: str) -> str:
         """ Generates the alias command """
         if "bash" in shell or "zsh" in shell or "ksh" in shell:
             alias_command: str = f"alias {alias}=\"{command}\""
@@ -126,6 +126,8 @@ def main() -> int:
 
     # --------------- Getting values needed to configure all shells -------------- #
 
+    # Creating an instance of the class `QuickAlias`
+    quickalias = QuickAlias()
 
     # Creating a description for the script and then creating a parser for the arguments.
     module_description: str = "This script creates pemenant aliases so you don't have to."
@@ -207,15 +209,10 @@ def main() -> int:
 
     del alias_written, alias  # No longer needed.
 
-    source_command: str = f"source {shell_config}"
-    del shell_config  # No longer needed.
-
     if show_source_command:
-        print(f"You can source the new changes with:\n\t{source_command}")
+        print(f"You can source the new changes with:\n\tsource {shell_config}")
     return 0
 
 
 if __name__ == '__main__':
-    # Creating an instance of the class `QuickAlias`
-    quickalias = QuickAlias()
     sys.exit(main())
