@@ -12,6 +12,7 @@ class QuickAlias:
     """
     Creates permenant aliases
     """
+
     def __init__(self):
         pass
 
@@ -59,7 +60,7 @@ class QuickAlias:
             return ["fish", "-c", f"alias --save {alias} \"{command}\""]
         return alias_command
 
-    def write_alias(self, alias_command: str, config_file: str)->any:
+    def write_alias(self, alias_command: str, config_file: str) -> any:
         """ Writes the alias command to the config file """
         with open(config_file, encoding="utf-8") as file:
             if alias_command in file.read():
@@ -69,7 +70,8 @@ class QuickAlias:
             return -2
 
         if not os.path.exists(config_file):
-            open(config_file, "w", encoding="utf-8").close()
+            with open(config_file, "w", encoding="utf-8") as file:
+                pass
 
         with open(config_file, 'a', encoding="utf-8") as file:
             file.write(f"{alias_command}\n")
@@ -152,6 +154,7 @@ def main() -> int:
         print(f"\nAdded \"{alias_string}\" to shell config")
 
     elif "fish" in shell:
+
         # Running the fish shell with the `-c` flag, which allows you to run a command in the shell.
         alias_command: str = quickalias.generate_alias_command(
             alias, command, shell
