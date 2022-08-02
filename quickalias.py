@@ -77,16 +77,12 @@ class QuickAlias:
 
         if os.path.isdir(config_file):
             return -2
+        if os.path.exists(config_file):
+            with open(config_file, encoding="utf-8") as file:
+                if alias_command in file.read():
+                    return -1
 
-        if not os.path.exists(config_file):
-            with open(config_file, "w", encoding="utf-8") as file:
-                pass
-
-        with open(config_file, encoding="utf-8") as file:
-            if alias_command in file.read():
-                return -1
-
-        with open(config_file, 'a', encoding="utf-8") as file:
+        with open(config_file, 'w', encoding="utf-8") as file:
             file.write(f"{alias_command}\n")
         return 0
 
@@ -170,9 +166,6 @@ def main() -> int:
             print(f"\n{shell_config} is a directory", file=sys.stderr)
             return 1
 
-        # Opening the config file in append mode and writing the alias to the file.
-        with open(shell_config, 'a', encoding="utf-8") as file:
-            file.write(f"{alias_string}\n")
 
         print(f"\nAdded \"{alias_string}\" to shell config")
 
