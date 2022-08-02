@@ -8,7 +8,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     LONG_DESCRIPTION = "\n" + fh.read()
 
-VERSION = "3.0.2"
+VERSION = "3.1.0"
 DESCRIPTION = "Creates permanent aliases"
 # LONG_DESCRIPTION = "Creates permanent aliases so you don't have to open your shell config file"
 

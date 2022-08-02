@@ -41,7 +41,7 @@ class QuickAlias:
             # Getting the path of the config.fish file.
             shell_config_path: str = os.path.join(
                 os.environ.get('XDG_CONFIG_HOME') or os.path.join(
-                home, '.config'), 'fish/config.fish')
+                    home, '.config'), 'fish/config.fish')
 
         elif "ksh" in shell:
             # Getting the path of the .kshrc file.
@@ -130,21 +130,15 @@ def main() -> int:
 
     # Getting the home directory of the user.
     user_directory: str = quickalias.get_home_dir()
-
-    if user_directory == '':
-        print('Could not find home directory', file=sys.stderr)
-        return 1
-
     # Getting the process id of the parent process from proc.
     shell: str = quickalias.detect_shell()
 
-    if shell == '':
-        print('Could not detect shell', file=sys.stderr)
+    if user_directory == '' or shell == '':
+        print('Error', file=sys.stderr)
         return 1
 
     # Getting the path of the shell config file.
-    shell_config: str = quickalias.get_shell_config_file(
-        shell, user_directory)
+    shell_config: str = quickalias.get_shell_config_file(shell, user_directory)
 
     if shell_config is None:
         shell: str = "bash"
@@ -162,10 +156,8 @@ def main() -> int:
 
     elif "powershell" in shell:
         shell_config_list = shell_config.split("/")[:-1]
-
-        shell_config_dir :str= "/".join(shell_config_list)
-        if not os.path.exists(shell_config_dir):
-            os.makedirs(shell_config_dir, exist_ok=True)
+        shell_config_dir: str = "/".join(shell_config_list)
+        os.makedirs(shell_config_dir, exist_ok=True)
 
         # generating the alias command.
         alias_string: str = quickalias.generate_alias_command(
@@ -199,18 +191,17 @@ def main() -> int:
         if alias_written == -1:
             print(f"\n{alias} already exists in {shell_config}",
                   file=sys.stderr)
-            return 0
+            sys.exit(1)
 
         if alias_written == -2:
             print(f"\n{shell_config} is a directory", file=sys.stderr)
-            return 1
+            sys.exit(1)
 
         print(f"\nAdded \"{alias_string}\" to shell config")
 
         source_command: str = f"source {shell_config}"
         print(f"You can source the new changes with:\n\t{source_command}")
     return 0
-
 
 if __name__ == '__main__':
     sys.exit(main())
