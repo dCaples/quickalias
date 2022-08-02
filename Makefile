@@ -4,9 +4,11 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/usr/local/bin
 	install -Dm755 ./quickalias.py "$(DESTDIR)$(PREFIX)/usr/local/bin/quickalias"
 
-package: clean
-	python3 setup.py sdist bdist_wheel --universal
+lint:
+	pylint quickalias.py
 
+package: clean
+	python3 setup.py sdist bdist_wheel
 
 upload: package
 	twine upload dist/* --repository quickalias
