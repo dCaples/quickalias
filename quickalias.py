@@ -120,7 +120,7 @@ def get_alias_command(args: argparse.Namespace) -> list:
 def err(message: str, file=sys.stderr):
     """ Prints an error message and exit"""
     print(f"Error: {message}", file=file)
-    return 1
+    sys.exit(1)
 
 
 def main() -> int:
