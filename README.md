@@ -28,6 +28,8 @@ pip install quickalias
 
 You can install with the PKGBUILD (for Arch users):
 
+> There's built packages in the [archlinux-repo](https://github.com/El-Wumbus/archlinux-repo) repo here on github.
+
 ```bash
 git clone https://github.com/dCaples/quickalias
 cd quickalias
